@@ -7,7 +7,9 @@ that ensures I always have my latest credit card statement handy
 
 - Trawl through emails (gmail support only; email address must be provided as an env var)
   to find the latest credit card statement
-- Download the statement (script assumes it's a pdf attachment)
+  - It's assumed that the most recently received email with "Credit Card Statement" in the subject
+    and a pdf attachment is our target
+- Download the statement pdf
 - Strip password if any (password must be provided as the env var)
 - Extract the first page (usually the one that contains the address)
 - Upload the extracted page to google drive (location to be provided as an env var)
