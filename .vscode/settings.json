@@ -1,3 +1,9 @@
 {
-  "python.pythonPath": "/home/anirudh/.venv/update-credit-card-statement-in-gdrive/bin/python"
+  "python.pythonPath": "/home/anirudh/.venv/muller/bin/python",
+  "editor.formatOnSave": true,
+  "python.linting.flake8Enabled": true,
+  "python.linting.pylintEnabled": false,
+  "python.formatting.autopep8Args": ["-i"],
+  "python.formatting.autopep8Path": "/home/anirudh/.venv/muller/bin/autopep8",
+  "editor.tabSize": 4
 }
