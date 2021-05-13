@@ -1,9 +1,11 @@
 import os
 import logging
 
+from base64 import urlsafe_b64decode
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
+from tempfile import TemporaryFile
 
 from utils import get_headers, get_attachment_details
 
@@ -72,5 +74,9 @@ latest_cc_stmt_message = cc_stmt_messages[0]
 #   but in the absence of data to figure out a good heuristic,
 #   I'm going with this
 cc_stmt_id = latest_cc_stmt_message['attachment_details'][0]['id']
-cc_stmt = gmail_service.users().messages().attachments().get(
+cc_stmt_b64url_encoded = gmail_service.users().messages().attachments().get(
     'me', latest_cc_stmt_message['id'], cc_stmt_id).execute()['data']
+cc_stmt_binary = urlsafe_b64decode(cc_stmt_b64url_encoded)
+
+tmpfile = TemporaryFile()
+tmpfile.write(cc_stmt_binary)
