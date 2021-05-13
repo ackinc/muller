@@ -11,7 +11,10 @@ load_dotenv()
 logger = logging.getLogger()
 logger.setLevel(logging.DEBUG)
 
-SCOPES = ['https://www.googleapis.com/auth/drive', 'https://www.googleapis.com/auth/gmail.readonly']
+SCOPES = [
+    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/gmail.readonly'
+]
 credentials = Credentials(
     '',
     refresh_token=os.environ['REFRESH_TOKEN'],
@@ -22,9 +25,6 @@ credentials = Credentials(
 )
 
 gmail_service = build('gmail', 'v1', credentials=credentials)
-users_resource = gmail_service.users()
-user_profile = users_resource.getProfile(userId='me').execute()
-print(user_profile)
 
 cc_stmt_messages = gmail_service.users().messages().list(
     userId='me',
@@ -33,14 +33,14 @@ cc_stmt_messages = gmail_service.users().messages().list(
 
 # get the full details for each message
 cc_stmt_messages = [
-    gmail_service.users().messages().get(usedId='me', id=msg['id']).execute()
+    gmail_service.users().messages().get(userId='me', id=msg['id']).execute()
     for msg in cc_stmt_messages['messages']
 ]
 
 # extract just the details we care about
 cc_stmt_messages = [
     {
-        id: msg['id'],
+        'id': msg['id'],
         **get_headers(msg, ['Date', 'Subject', 'Content-Type']),
         **{
             'attachment_details': [
@@ -60,7 +60,7 @@ cc_stmt_messages = [
 ]
 
 if len(cc_stmt_messages) == 0:
-    print("No credit card statement emails found in gmail. Exiting.")
+    print("No credit card statement emails found in your gmail. Exiting.")
     exit(0)
 
 # messages are returned latest-first by google

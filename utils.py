@@ -31,7 +31,3 @@ def get_attachment_details(gmail_message):
         for part in gmail_message['payload']['parts']
         if part['filename'] != ''
     ]
-
-
-def get_attachment(gmail_message):
-    pass
