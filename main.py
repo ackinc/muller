@@ -28,7 +28,7 @@ print(user_profile)
 
 cc_stmt_messages = gmail_service.users().messages().list(
     userId='me',
-    q="subject:(Credit Card Statement)"
+    q=os.environ['EMAILS_SEARCH_QUERY']
 ).execute()
 
 # get the full details for each message
