@@ -1,11 +1,12 @@
 import os
 import logging
+import subprocess
 
 from base64 import urlsafe_b64decode
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
-from tempfile import TemporaryFile
+from tempfile import gettempdir, NamedTemporaryFile
 
 from utils import get_headers, get_attachment_details
 
@@ -75,8 +76,29 @@ latest_cc_stmt_message = cc_stmt_messages[0]
 #   I'm going with this
 cc_stmt_id = latest_cc_stmt_message['attachment_details'][0]['id']
 cc_stmt_b64url_encoded = gmail_service.users().messages().attachments().get(
-    'me', latest_cc_stmt_message['id'], cc_stmt_id).execute()['data']
+    userId='me', messageId=latest_cc_stmt_message['id'], id=cc_stmt_id
+).execute()['data']
 cc_stmt_binary = urlsafe_b64decode(cc_stmt_b64url_encoded)
 
-tmpfile = TemporaryFile()
+tmpfile = NamedTemporaryFile()
 tmpfile.write(cc_stmt_binary)
+
+tmpfilenameparts = os.path.split(tmpfile.name)
+nopassfilename = os.path.join(
+    gettempdir(),
+    "{x}-nopass.pdf".format(x=tmpfilenameparts[1])
+)
+subprocess.run([
+    'pdftops',
+    '-upw',
+    os.environ['CREDIT_CARD_STATEMENT_PDF_PASSWORD'],
+    tmpfile.name,
+    nopassfilename
+])
+
+# TODO:
+# - use ghostscript to repair pdf if necessary
+# - use pdfseparate to extract the first page
+# - upload to gdrive
+
+print('Done')
