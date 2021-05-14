@@ -38,7 +38,7 @@ cc_stmt_message_candidates = gmail_service.users().messages().list(
 cc_stmt_message = None
 
 # messages are returned latest-first by google, so we
-# just find the first message in the list with a pdf attachment
+#   just find the first message in the list with a pdf attachment
 for cdt in cc_stmt_message_candidates:
     # get the full details of the candidate msg
     msg_full = gmail_service.users().messages().get(
@@ -70,6 +70,9 @@ cc_stmt_binary = urlsafe_b64decode(cc_stmt_b64url_encoded)
 
 tmpfile = NamedTemporaryFile()
 tmpfile.write(cc_stmt_binary)
+
+
+# extract first page of statement (usually the page that has the address)
 tmpfilename = get_filename(tmpfile.name)
 
 nopass_filepath = os.path.join(gettempdir(), f"{tmpfilename}-nopass.pdf")
@@ -79,5 +82,10 @@ first_page_path = os.path.join(gettempdir(), f"{tmpfilename}-nopass-pg-1.pdf")
 extract_pdf_first_page(nopass_filepath, first_page_path)
 
 # TODO: upload to gdrive
+
+# remove intermediate files
+os.remove(nopass_filepath)
+os.remove(first_page_path)
+
 
 print('Done')
