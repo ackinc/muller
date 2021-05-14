@@ -17,6 +17,7 @@ that ensures I always have my latest credit card statement handy
 ## Deployment Notes
 
 - This app will be deployed to a Heroku dyno running Ubuntu
-  - Since it requires the `pdftops` and `pdfseparate` utilities which are not
-    installed by default on Heroku dynos (run `apt install poppler-utils` to get them),
+  - Since it requires the `pdftops`, `pdfseparate`, and `ghostscript`
+    utilities which are not installed by default on Heroku dynos
+    (run `apt install ghostscript poppler-utils` to get them),
     I'll have to work with a custom buildpack to make them available

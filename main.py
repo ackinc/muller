@@ -1,6 +1,5 @@
 import os
 import logging
-import subprocess
 
 from base64 import urlsafe_b64decode
 from dotenv import load_dotenv
@@ -9,7 +8,8 @@ from google.oauth2.credentials import Credentials
 from tempfile import gettempdir, NamedTemporaryFile
 
 from utils.gmail import get_headers, get_attachment_details
-from utils.tempfile import get_tempfile_name
+from utils.misc import get_filename, extract_pdf_first_page, \
+    remove_pdf_password
 
 load_dotenv()
 logger = logging.getLogger()
@@ -80,22 +80,14 @@ cc_stmt_binary = urlsafe_b64decode(cc_stmt_b64url_encoded)
 
 tmpfile = NamedTemporaryFile()
 tmpfile.write(cc_stmt_binary)
+tmpfilename = get_filename(tmpfile.name)
 
-nopassfilename = os.path.join(
-    gettempdir(),
-    f"{get_tempfile_name(tmpfile)}-nopass.pdf"
-)
-subprocess.run([
-    'pdftops',
-    '-upw',
-    os.environ['CREDIT_CARD_STATEMENT_PDF_PASSWORD'],
-    tmpfile.name,
-    nopassfilename
-])
+nopass_filepath = os.path.join(gettempdir(), f"{tmpfilename}-nopass.pdf")
+remove_pdf_password(tmpfile.name, nopass_filepath)
 
-# TODO:
-# - use ghostscript to repair pdf if necessary
-# - use pdfseparate to extract the first page
-# - upload to gdrive
+first_page_path = os.path.join(gettempdir(), f"{tmpfilename}-nopass-pg-1.pdf")
+extract_pdf_first_page(nopass_filepath, first_page_path)
+
+# TODO: upload to gdrive
 
 print('Done')
