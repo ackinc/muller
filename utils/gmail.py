@@ -1,3 +1,17 @@
+def get_relevant_message_details(gmail_message):
+    return {
+        'id': gmail_message['id'],
+        **get_headers(gmail_message, ['Date', 'Subject', 'Content-Type']),
+        **{
+            'attachment_details': [
+                # we only care about pdf attachments
+                x for x in get_attachment_details(gmail_message)
+                if x['filename'].lower().endswith('.pdf')
+            ]
+        }
+    }
+
+
 def get_headers(gmail_message, headers):
     result = {}
 

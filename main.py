@@ -7,7 +7,7 @@ from googleapiclient.discovery import build
 from google.oauth2.credentials import Credentials
 from tempfile import gettempdir, NamedTemporaryFile
 
-from utils.gmail import get_headers, get_attachment_details
+from utils.gmail import get_relevant_message_details
 from utils.misc import get_filename, extract_pdf_first_page, \
     remove_pdf_password
 
@@ -45,17 +45,7 @@ for cdt in cc_stmt_message_candidates:
         userId='me', id=cdt['id']).execute()
 
     # extract just the details we care about
-    msg_details = {
-        'id': msg_full['id'],
-        **get_headers(msg_full, ['Date', 'Subject', 'Content-Type']),
-        **{
-            'attachment_details': [
-                # we only care about pdf attachments
-                x for x in get_attachment_details(msg_full)
-                if x['filename'].lower().endswith('.pdf')
-            ]
-        }
-    }
+    msg_details = get_relevant_message_details(msg_full)
 
     if len(msg_details['attachment_details']) > 0:
         cc_stmt_message = msg_details
