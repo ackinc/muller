@@ -4,6 +4,7 @@ import logging
 from base64 import urlsafe_b64decode
 from dotenv import load_dotenv
 from googleapiclient.discovery import build
+from googleapiclient.http import MediaFileUpload
 from google.oauth2.credentials import Credentials
 from tempfile import gettempdir, NamedTemporaryFile
 
@@ -29,6 +30,7 @@ credentials = Credentials(
 )
 
 gmail_service = build('gmail', 'v1', credentials=credentials)
+gdrive_service = build('drive', 'v3', credentials=credentials)
 
 cc_stmt_message_candidates = gmail_service.users().messages().list(
     userId='me',
@@ -81,7 +83,18 @@ remove_pdf_password(tmpfile.name, nopass_filepath)
 first_page_path = os.path.join(gettempdir(), f"{tmpfilename}-nopass-pg-1.pdf")
 extract_pdf_first_page(nopass_filepath, first_page_path)
 
-# TODO: upload to gdrive
+
+# upload to gdrive
+media = MediaFileUpload(first_page_path, mimetype='application/pdf')
+gdrive_service.files().create(
+    body={
+        'name': 'latest_credit_card_statement.pdf',
+        'mimeType': 'application/pdf',
+        'parents': [os.environ['DRIVE_FOLDER_ID']]
+    },
+    media_body=media
+).execute()
+
 
 # remove intermediate files
 os.remove(nopass_filepath)
