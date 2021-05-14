@@ -19,7 +19,12 @@ def remove_pdf_password(pdfpath, outfilepath):
     return outfilepath
 
 
-def extract_pdf_first_page(pdfpath, outfilepath, try_fix=True):
+def extract_pdf_first_page(
+    pdfpath,
+    outfilepath,
+    try_fix=True,
+    remove_original=False
+):
     try:
         subprocess.run([
             'pdfseparate',
@@ -49,6 +54,9 @@ def extract_pdf_first_page(pdfpath, outfilepath, try_fix=True):
         ], check=True)
 
         return extract_pdf_first_page(
-            repairedfilepath, outfilepath, try_fix=False)
+            repairedfilepath, outfilepath, try_fix=False, remove_original=True)
+
+    if remove_original:
+        os.remove(pdfpath)
 
     return outfilepath
